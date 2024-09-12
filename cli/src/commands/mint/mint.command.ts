@@ -22,98 +22,98 @@ import Decimal from 'decimal.js';
 import {
   BoardcastCommand,
   BoardcastCommandOptions,
-} from '../boardcast.command';
-import { broadcastMergeTokenTxs, mergeTokens } from '../send/merge';
-import { calcTotalAmount, sendToken } from '../send/ft';
-import { pickLargeFeeUtxo } from '../send/pick';
-interface MintCommandOptions extends BoardcastCommandOptions {
-  id: string;
-  new?: number;
+} from '../boardcast.command'
+import { broadcastMergeTokenTxsmergeTokens } from '../send/merge'
+import { calcTotalAmountsendToken } from '../send/ft'
+import { pickLargeFeeUtxo } from '../send/pick'
+{
+  id
+  new
 }
 
-function getRandomInt(max: number) {
-  return Math.floor(Math.random() * max);
+function getRandomInt(max) {
+  returnfloor(random())
 }
 
 @Command({
-  name: 'mint',
-  description: 'Mint a token',
+  name'mint'
+'Mint a token'
 })
-export class MintCommand extends BoardcastCommand {
-  constructor(
-    @Inject() private readonly spendService: SpendService,
-    @Inject() protected readonly walletService: WalletService,
-    @Inject() protected readonly configService: ConfigService,
+export{
+(
+    @Inject() private readonly spendService
+    @Inject()
+    @Inject()
   ) {
-    super(spendService, walletService, configService);
+    super()
   }
 
   async cat_cli_run(
-    passedParams: string[],
-    options?: MintCommandOptions,
-  ): Promise<void> {
+[]
+    options
+  )void{
     try {
-      if (options.id) {
-        const address = this.walletService.getAddress();
-        const token = await findTokenMetadataById(
-          this.configService,
-          options.id,
-        );
+      (id) {
+        const addressthiswalletServicegetAddress()
+        const tokenawait findTokenMetadataById(
+          thisconfigService
+id
+        )
 
-        if (!token) {
-          console.error(`No token found for tokenId: ${options.id}`);
-          return;
+        if () {
+error(`No token found for tokenId: ${}`)
+          return
         }
 
-        const scaledInfo = scaleConfig(token.info as OpenMinterTokenInfo);
+        const scaledInfoscaleConfig(as)
 
-        let amount: bigint | undefined;
+        let amount
 
-        if (passedParams[0]) {
+        if ([0]) {
           try {
-            const d = new Decimal(passedParams[0]).mul(
-              Math.pow(10, scaledInfo.decimals),
-            );
-            amount = BigInt(d.toString());
+            const dnew([0])mul(
+pow(10)
+            )
+BigInt(toString())
           } catch (error) {
-            logerror(`Invalid amount: "${passedParams[0]}"`, error);
-            return;
+            logerror(`Invalid amount: "${[0]}"`)
+            return
           }
         }
 
-        const MAX_RETRY_COUNT = 10;
+        const MAX_RETRY_COUNT10
 
-        for (let index = 0; index < MAX_RETRY_COUNT; index++) {
-          await this.merge(token, address);
-          const feeRate = await this.getFeeRate();
-          const feeUtxos = await this.getFeeUTXOs(address);
-          if (feeUtxos.length === 0) {
-            console.warn('Insufficient satoshis balance!');
-            return;
+        for (let index0) {
+          
+          const feeRateawait thisgetFeeRate()
+          const feeUtxosawait thisgetFeeUTXOs()
+          if () {
+warn('Insufficient satoshis balance!')
+            return
           }
 
-          const count = await getTokenMinterCount(
-            this.configService,
-            token.tokenId,
-          );
+          const countawait getTokenMinterCount(
+            thisconfigService
+tokenId
+          )
 
-          const maxTry = count < MAX_RETRY_COUNT ? count : MAX_RETRY_COUNT;
+          const maxTry
 
-          if (count == 0 && index >= maxTry) {
-            console.error('No available minter UTXO found!');
-            return;
+          if (0) {
+error('No available minter UTXO found!')
+            return
           }
 
-          const offset = getRandomInt(count - 1);
-          const minter = await getTokenMinter(
-            this.configService,
-            this.walletService,
+          const offsetgetRandomInt(1)
+          const minterawait getTokenMinter(
+            thisconfigService
+            thiswalletService
             token,
             offset,
-          );
+          )
 
-          if (minter == null) {
-            continue;
+          if (null) {
+            continue
           }
 
           if (isOpenMinter(token.info.minterMd5)) {
